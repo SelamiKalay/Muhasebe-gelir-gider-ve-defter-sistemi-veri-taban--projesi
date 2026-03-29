@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{{ fis['FisNo'] }} — Fiş Detayı{% endblock %}
+
+{% block content %}
+<!-- ═══════ Geri ve Başlık ═══════ -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{{ url_for('fisler') }}" class="btn btn-sm btn-outline-secondary mb-2">
+            <i class="bi bi-arrow-left me-1"></i>Fişlere Dön
+        </a>
+        <h1 class="page-title mb-1">
+            <i class="bi bi-receipt me-2"></i>{{ fis['FisNo'] }}
+        </h1>
+        <p class="text-muted mb-0">Fiş detay bilgileri ve satırları</p>
+    </div>
+    <span class="badge badge-tur badge-{{ fis['FisTuru']|lower }} fs-6 px-3 py-2">
+        {{ fis['FisTuru'] }}
+    </span>
+</div>
+
+<!-- ═══════ Başlık Bilgileri ═══════ -->
+<div class="glass-card mb-4">
+    <div class="card-header-custom">
+        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Başlık Bilgileri</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="info-label">Fiş No</div>
+                <div class="info-value">{{ fis['FisNo'] }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-label">Tarih</div>
+                <div class="info-value">
+                    <i class="bi bi-calendar3 me-1"></i>{{ fis['FisTarihi'] }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-label">Dönem</div>
+                <div class="info-value">{{ fis['DonemAdi'] }}</div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-label">Kullanıcı</div>
+                <div class="info-value">
+                    <i class="bi bi-person me-1"></i>{{ fis['Kullanici'] }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-label">Durum</div>
+                <div class="info-value">
+                    <span class="badge bg-success">{{ fis['Durum'] }}</span>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="info-label">Açıklama</div>
+                <div class="info-value">{{ fis['Aciklama'] or '—' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ Fiş Satırları ═══════ -->
+<div class="glass-card">
+    <div class="card-header-custom">
+        <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Fiş Satırları</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hesap</th>
+                        <th>Cari</th>
+                        <th>Kategori</th>
+                        <th class="text-end">Borç (₺)</th>
+                        <th class="text-end">Alacak (₺)</th>
+                        <th>Açıklama</th>
+                        <th>Para Birimi</th>
+                        <th class="text-end">Kur</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in satirlar %}
+                    <tr>
+                        <td class="text-muted">{{ loop.index }}</td>
+                        <td>
+                            <span class="fw-semibold">{{ s['HesapKodu'] }}</span>
+                            <br><small class="text-muted">{{ s['HesapAdi'] }}</small>
+                        </td>
+                        <td>
+                            {% if s['CariAdi'] %}
+                                {{ s['CariKodu'] }} — {{ s['CariAdi'] }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s['KategoriAdi'] %}
+                                <span class="badge bg-{% if s['KategoriTuru']=='Gelir' %}success{% else %}danger{% endif %} bg-opacity-25">
+                                    {{ s['KategoriAdi'] }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-semibold {% if s['BorcTutari'] > 0 %}text-info{% endif %}">
+                            {{ "{:,.2f}".format(s['BorcTutari']) }}
+                        </td>
+                        <td class="text-end fw-semibold {% if s['AlacakTutari'] > 0 %}text-warning{% endif %}">
+                            {{ "{:,.2f}".format(s['AlacakTutari']) }}
+                        </td>
+                        <td class="small">{{ s['Aciklama'] or '—' }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary">{{ s['ParaBirimi'] }}</span>
+                        </td>
+                        <td class="text-end">{{ "{:,.4f}".format(s['KurDegeri']) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    {% set toplam_borc = satirlar|sum(attribute='BorcTutari') %}
+                    {% set toplam_alacak = satirlar|sum(attribute='AlacakTutari') %}
+                    <tr class="fw-bold">
+                        <td colspan="4" class="text-end">TOPLAM:</td>
+                        <td class="text-end text-info">{{ "{:,.2f}".format(toplam_borc) }}</td>
+                        <td class="text-end text-warning">{{ "{:,.2f}".format(toplam_alacak) }}</td>
+                        <td colspan="3">
+                            {% if (toplam_borc - toplam_alacak)|abs < 0.01 %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Dengeli</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Dengesiz!</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

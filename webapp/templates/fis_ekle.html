@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Yeni Fiş Ekle — Muhasebe Sistemi{% endblock %}
+
+{% block content %}
+<!-- ═══════ Sayfa Başlığı ═══════ -->
+<div class="mb-4">
+    <h1 class="page-title mb-1">
+        <i class="bi bi-plus-circle me-2"></i>Yeni Muhasebe Fişi
+    </h1>
+    <p class="text-muted mb-0">Fiş başlık bilgilerini ve satırlarını girin</p>
+</div>
+
+<!-- ═══════ Bildirim Alanı ═══════ -->
+<div id="fisAlertContainer"></div>
+
+<!-- ═══════ Fiş Formu ═══════ -->
+<form id="fisForm">
+    <!-- Başlık Bilgileri -->
+    <div class="glass-card mb-4">
+        <div class="card-header-custom">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Fiş Başlık Bilgileri</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="fisNo" class="form-label">Fiş No <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-custom" id="fisNo"
+                           placeholder="FIS-2026-0005" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fisTarihi" class="form-label">Fiş Tarihi <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control form-control-custom" id="fisTarihi" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="fisTuru" class="form-label">Fiş Türü <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom" id="fisTuru" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="Mahsup">Mahsup</option>
+                        <option value="Tahsil">Tahsil</option>
+                        <option value="Tediye">Tediye</option>
+                        <option value="Acilis">Açılış</option>
+                        <option value="Kapanis">Kapanış</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="donemId" class="form-label">Dönem <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom" id="donemId" required>
+                        <option value="">Seçiniz...</option>
+                        {% for d in donemler %}
+                        <option value="{{ d['DonemID'] }}">{{ d['DonemAdi'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="aciklama" class="form-label">Açıklama</label>
+                    <input type="text" class="form-control form-control-custom" id="aciklama"
+                           placeholder="Fiş açıklaması...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fiş Satırları -->
+    <div class="glass-card mb-4">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-ol me-2"></i>Fiş Satırları</h5>
+            <button type="button" class="btn btn-sm btn-gradient" id="btnSatirEkle">
+                <i class="bi bi-plus me-1"></i>Satır Ekle
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-custom mb-0" id="satirTablosu">
+                    <thead>
+                        <tr>
+                            <th style="width:5%">#</th>
+                            <th style="width:20%">Hesap <span class="text-danger">*</span></th>
+                            <th style="width:15%">Cari</th>
+                            <th style="width:15%">Kategori</th>
+                            <th style="width:12%">Borç (₺)</th>
+                            <th style="width:12%">Alacak (₺)</th>
+                            <th style="width:15%">Açıklama</th>
+                            <th style="width:6%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="satirlarBody">
+                        <!-- JavaScript ile dinamik olarak eklenir -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="4" class="text-end">TOPLAM:</td>
+                            <td class="text-end" id="toplamBorc">0.00</td>
+                            <td class="text-end" id="toplamAlacak">0.00</td>
+                            <td colspan="2">
+                                <span id="dengeStatus" class="badge bg-secondary">—</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gönder Butonu -->
+    <div class="d-flex justify-content-end gap-3">
+        <a href="{{ url_for('fisler') }}" class="btn btn-outline-secondary btn-lg px-4">
+            <i class="bi bi-x-circle me-2"></i>İptal
+        </a>
+        <button type="submit" class="btn btn-gradient btn-lg px-5" id="btnKaydet">
+            <i class="bi bi-check-circle me-2"></i>Fişi Kaydet
+        </button>
+    </div>
+</form>
+
+<!-- Hesap, Cari, Kategori verilerini JS'e aktarma -->
+<script>
+    const HESAPLAR = {{ hesaplar|list|tojson }};
+    const CARILER  = {{ cariler|list|tojson }};
+    const KATEGORILER = {{ kategoriler|list|tojson }};
+</script>
+{% endblock %}

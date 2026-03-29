@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Muhasebe Sistemi{% endblock %}
+
+{% block content %}
+<!-- ═══════ Sayfa Başlığı ═══════ -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </h1>
+        <p class="text-muted mb-0">Gelir-gider özeti ve genel istatistikler</p>
+    </div>
+    <a href="{{ url_for('fis_ekle_form') }}" class="btn btn-gradient btn-lg">
+        <i class="bi bi-plus-circle me-2"></i>Yeni Fiş Ekle
+    </a>
+</div>
+
+<!-- ═══════ İstatistik Kartları ═══════ -->
+<div class="row g-4 mb-4">
+    <!-- Toplam Gelir -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-gelir">
+            <div class="stat-card-body">
+                <div class="stat-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Toplam Gelir</span>
+                    <span class="stat-value">₺{{ "{:,.2f}".format(toplam_gelir) }}</span>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <i class="bi bi-arrow-up-short"></i> Tüm dönemler
+            </div>
+        </div>
+    </div>
+
+    <!-- Toplam Gider -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-gider">
+            <div class="stat-card-body">
+                <div class="stat-icon">
+                    <i class="bi bi-graph-down-arrow"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Toplam Gider</span>
+                    <span class="stat-value">₺{{ "{:,.2f}".format(toplam_gider) }}</span>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <i class="bi bi-arrow-down-short"></i> Tüm dönemler
+            </div>
+        </div>
+    </div>
+
+    <!-- Net Kâr/Zarar -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card {% if net_kar >= 0 %}stat-card-kar{% else %}stat-card-zarar{% endif %}">
+            <div class="stat-card-body">
+                <div class="stat-icon">
+                    <i class="bi bi-{% if net_kar >= 0 %}trophy{% else %}exclamation-triangle{% endif %}"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Net Kâr/Zarar</span>
+                    <span class="stat-value">₺{{ "{:,.2f}".format(net_kar) }}</span>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <i class="bi bi-{% if net_kar >= 0 %}check-circle{% else %}dash-circle{% endif %}"></i>
+                {% if net_kar >= 0 %}Kâr{% else %}Zarar{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Fiş Adedi -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card stat-card-fis">
+            <div class="stat-card-body">
+                <div class="stat-icon">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Toplam Fiş</span>
+                    <span class="stat-value">{{ fis_adedi }}</span>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <i class="bi bi-journal-bookmark"></i> Aktif fişler
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ İçerik Tabloları ═══════ -->
+<div class="row g-4">
+    <!-- Günlük Gelir-Gider Özeti -->
+    <div class="col-lg-7">
+        <div class="glass-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-date me-2"></i>Günlük Gelir-Gider Özeti
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0" id="gunlukOzetTablosu">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th class="text-end">Gelir (₺)</th>
+                                <th class="text-end">Gider (₺)</th>
+                                <th class="text-end">Net (₺)</th>
+                                <th class="text-center">Fiş</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in gunluk_ozet %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    {{ row['Tarih'] }}
+                                </td>
+                                <td class="text-end text-success fw-semibold">
+                                    {{ "{:,.2f}".format(row['ToplamGelir']) }}
+                                </td>
+                                <td class="text-end text-danger fw-semibold">
+                                    {{ "{:,.2f}".format(row['ToplamGider']) }}
+                                </td>
+                                <td class="text-end fw-bold
+                                    {% if row['ToplamGelir'] - row['ToplamGider'] >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ "{:,.2f}".format(row['ToplamGelir'] - row['ToplamGider']) }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">{{ row['FisAdedi'] }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox me-2"></i>Henüz gelir-gider kaydı bulunmuyor.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Son Eklenen Fişler -->
+    <div class="col-lg-5">
+        <div class="glass-card">
+            <div class="card-header-custom">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Son Eklenen Fişler
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Fiş No</th>
+                                <th>Tür</th>
+                                <th class="text-end">Tutar (₺)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fis in son_fisler %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ fis['FisNo'] }}</div>
+                                    <small class="text-muted">{{ fis['FisTarihi'] }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-tur badge-{{ fis['FisTuru']|lower }}">
+                                        {{ fis['FisTuru'] }}
+                                    </span>
+                                </td>
+                                <td class="text-end fw-semibold">
+                                    {{ "{:,.2f}".format(fis['ToplamTutar']) }}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('fis_detay', fis_id=fis['FisID']) }}"
+                                       class="btn btn-sm btn-outline-light">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox me-2"></i>Henüz fiş bulunmuyor.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

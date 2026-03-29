@@ -1,0 +1,469 @@
+/* ═══════════════════════════════════════════════════
+   Muhasebe Sistemi — Özel Stiller
+   Premium dark theme with glassmorphism effects
+   ═══════════════════════════════════════════════════ */
+
+/* ── Genel ── */
+:root {
+    --accent-primary: #6C63FF;
+    --accent-secondary: #4ECDC4;
+    --accent-gelir: #00C896;
+    --accent-gider: #FF6B6B;
+    --accent-kar: #FFD93D;
+    --accent-fis: #6C63FF;
+    --glass-bg: rgba(30, 30, 46, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --card-bg: rgba(35, 38, 55, 0.85);
+    --surface-hover: rgba(255, 255, 255, 0.04);
+    --gradient-primary: linear-gradient(135deg, #6C63FF 0%, #4ECDC4 100%);
+    --gradient-gelir: linear-gradient(135deg, #00C896 0%, #00E5A0 100%);
+    --gradient-gider: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+    --gradient-kar: linear-gradient(135deg, #FFD93D 0%, #FFE066 100%);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: #0f0f1a;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(78, 205, 196, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(255, 107, 107, 0.04) 0%, transparent 50%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #e0e0e8;
+}
+
+/* ── Navbar ── */
+.glass-nav {
+    background: rgba(15, 15, 26, 0.85) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 0.6rem 0;
+    z-index: 1030;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--gradient-primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+}
+
+.brand-text {
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.navbar .nav-link {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.navbar .nav-link:hover {
+    color: rgba(255, 255, 255, 0.95) !important;
+    background: var(--surface-hover);
+}
+
+.navbar .nav-link.active {
+    color: white !important;
+    background: rgba(108, 99, 255, 0.2);
+    border: 1px solid rgba(108, 99, 255, 0.3);
+}
+
+/* ── Sayfa Başlığı ── */
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f0f0f5;
+    letter-spacing: -0.02em;
+}
+
+/* ── Gradient Buton ── */
+.btn-gradient {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+    color: white;
+}
+
+.btn-gradient:active {
+    transform: translateY(0);
+}
+
+/* ── İstatistik Kartları ── */
+.stat-card {
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card-body {
+    padding: 1.3rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.stat-card-gelir .stat-icon {
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.2), rgba(0, 229, 160, 0.1));
+    color: var(--accent-gelir);
+}
+
+.stat-card-gider .stat-icon {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 142, 0.1));
+    color: var(--accent-gider);
+}
+
+.stat-card-kar .stat-icon {
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.2), rgba(0, 229, 160, 0.1));
+    color: var(--accent-gelir);
+}
+
+.stat-card-zarar .stat-icon {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 142, 0.1));
+    color: var(--accent-gider);
+}
+
+.stat-card-fis .stat-icon {
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(108, 99, 255, 0.1));
+    color: var(--accent-fis);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #f0f0f5;
+    letter-spacing: -0.02em;
+}
+
+.stat-card-footer {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    border-top: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Glass Card ── */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.card-header-custom {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+    font-weight: 600;
+}
+
+.card-footer-custom {
+    border-top: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Tablolar ── */
+.table-custom {
+    --bs-table-bg: transparent;
+    --bs-table-color: #e0e0e8;
+    margin: 0;
+}
+
+.table-custom > thead > tr > th {
+    border-bottom: 1px solid var(--glass-border);
+    padding: 0.85rem 1.2rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table-custom > tbody > tr > td {
+    padding: 0.85rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+    font-size: 0.88rem;
+}
+
+.table-custom > tbody > tr:hover {
+    background: var(--surface-hover);
+}
+
+.table-custom > tbody > tr:last-child > td {
+    border-bottom: none;
+}
+
+.table-custom > tfoot > tr > td {
+    padding: 0.85rem 1.2rem;
+    border-top: 2px solid var(--glass-border);
+    font-size: 0.9rem;
+}
+
+/* ── Badge — Fiş Türleri ── */
+.badge-tur {
+    font-weight: 600;
+    font-size: 0.72rem;
+    padding: 0.35em 0.7em;
+    border-radius: 6px;
+    letter-spacing: 0.03em;
+}
+
+.badge-tahsil {
+    background: rgba(0, 200, 150, 0.15) !important;
+    color: var(--accent-gelir) !important;
+    border: 1px solid rgba(0, 200, 150, 0.3);
+}
+
+.badge-tediye {
+    background: rgba(255, 107, 107, 0.15) !important;
+    color: var(--accent-gider) !important;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.badge-mahsup {
+    background: rgba(108, 99, 255, 0.15) !important;
+    color: var(--accent-primary) !important;
+    border: 1px solid rgba(108, 99, 255, 0.3);
+}
+
+.badge-acilis {
+    background: rgba(255, 217, 61, 0.15) !important;
+    color: var(--accent-kar) !important;
+    border: 1px solid rgba(255, 217, 61, 0.3);
+}
+
+.badge-kapanis {
+    background: rgba(255, 217, 61, 0.15) !important;
+    color: var(--accent-kar) !important;
+    border: 1px solid rgba(255, 217, 61, 0.3);
+}
+
+/* ── Form Elemanları ── */
+.form-control-custom,
+.form-select {
+    background: rgba(20, 20, 35, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 10px !important;
+    color: #e0e0e8 !important;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.form-control-custom:focus,
+.form-select:focus {
+    border-color: rgba(108, 99, 255, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+    outline: none !important;
+}
+
+.form-control-custom::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.form-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 0.35rem;
+}
+
+/* ── Info Label/Value (Detay sayfası) ── */
+.info-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #e8e8f0;
+}
+
+/* ── Alert ── */
+.glass-alert {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    font-size: 0.9rem;
+}
+
+/* ── Footer ── */
+.glass-footer {
+    border-top: 1px solid var(--glass-border);
+    background: rgba(15, 15, 26, 0.5);
+    margin-top: auto;
+}
+
+/* ── Satır silme butonu ── */
+.btn-satir-sil {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: var(--accent-gider);
+    background: transparent;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.btn-satir-sil:hover {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: rgba(255, 107, 107, 0.5);
+    transform: scale(1.05);
+}
+
+/* ── Denge durumu ── */
+.denge-ok {
+    background: var(--accent-gelir) !important;
+}
+
+.denge-fail {
+    background: var(--accent-gider) !important;
+}
+
+/* ── Form inline satır input ── */
+.satir-input {
+    background: rgba(20, 20, 35, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    color: #e0e0e8 !important;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    transition: var(--transition);
+    width: 100%;
+}
+
+.satir-input:focus {
+    border-color: rgba(108, 99, 255, 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.1) !important;
+    outline: none !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+    .stat-value {
+        font-size: 1.15rem;
+    }
+    .stat-card-body {
+        padding: 1rem;
+    }
+}
+
+/* ── Animasyonlar ── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card,
+.glass-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.stat-card:nth-child(2) { animation-delay: 0.05s; }
+.stat-card:nth-child(3) { animation-delay: 0.1s; }
+.stat-card:nth-child(4) { animation-delay: 0.15s; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

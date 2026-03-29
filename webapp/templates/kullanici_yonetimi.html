@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Kullanıcı Yönetimi — Muhasebe Sistemi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">
+        <i class="bi bi-people me-2"></i>Kullanıcı Yönetimi
+    </h1>
+    <button class="btn btn-primary btn-gradient" data-bs-toggle="modal" data-bs-target="#kullaniciEkleModal">
+        <i class="bi bi-person-plus me-1"></i>Yeni Kullanıcı Ekle
+    </button>
+</div>
+
+<!-- Bildirimler -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="glass-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 25%;">Kullanıcı Adı</th>
+                        <th style="width: 35%;">Ad Soyad</th>
+                        <th style="width: 20%;">Rol</th>
+                        <th style="width: 15%;">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>{{ user.KullaniciID }}</strong></td>
+                        <td>{{ user.KullaniciAdi }}</td>
+                        <td>{{ user.AdSoyad }}</td>
+                        <td>
+                            {% if user.Rol == 'Yonetici' %}
+                                <span class="badge bg-danger">Yönetici</span>
+                            {% elif user.Rol == 'Muhasebeci' %}
+                                <span class="badge bg-primary">Muhasebeci</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ user.Rol }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.Aktif == 1 %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aktif</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Pasif</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#sifreDegistirModal" onclick="setSifreModalUser({{ user.KullaniciID }}, '{{ user.KullaniciAdi }}')">
+                                <i class="bi bi-key"></i> Şifre Değiştir
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Kayıtlı kullanıcı bulunamadı.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Kullanıcı Ekleme Modalı -->
+<div class="modal fade" id="kullaniciEkleModal" tabindex="-1" aria-labelledby="kullaniciEkleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kullaniciEkleModalLabel"><i class="bi bi-person-plus me-2"></i>Yeni Kullanıcı Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form action="{{ url_for('kullanicilar') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="kullanici_adi" class="form-label">Kullanıcı Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="kullanici_adi" name="kullanici_adi" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ad_soyad" class="form-label">Ad Soyad <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sifre" class="form-label">Şifre <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="sifre" name="sifre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rol" class="form-label">Rol <span class="text-danger">*</span></label>
+                        <select class="form-select" id="rol" name="rol" required>
+                            <option value="Muhasebeci" selected>Muhasebeci</option>
+                            <option value="Yonetici">Yönetici</option>
+                            <option value="SaltOkunur">Salt Okunur</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary btn-gradient">Kullanıcıyı Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Şifre Değiştirme Modalı -->
+<div class="modal fade" id="sifreDegistirModal" tabindex="-1" aria-labelledby="sifreDegistirModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sifreDegistirModalLabel"><i class="bi bi-key me-2"></i> Şifre Değiştir (<span id="sifreModalUsername"></span>)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <form action="{{ url_for('sifre_degistir') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" id="sifreModalUserId" name="kullanici_id">
+                    <div class="mb-3">
+                        <label for="yeni_sifre" class="form-label">Yeni Şifre <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="yeni_sifre" name="yeni_sifre" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Şifreyi Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setSifreModalUser(id, username) {
+        document.getElementById('sifreModalUserId').value = id;
+        document.getElementById('sifreModalUsername').textContent = username;
+    }
+</script>
+
+{% endblock %}

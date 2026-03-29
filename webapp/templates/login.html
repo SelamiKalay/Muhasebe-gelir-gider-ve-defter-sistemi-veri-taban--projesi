@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Giriş Yap — Muhasebe Sistemi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5">
+        <div class="glass-card shadow-lg p-4 text-center">
+            
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle p-3 mb-3 shadow">
+                    <i class="bi bi-shield-lock" style="font-size: 2rem;"></i>
+                </div>
+                <h2 class="fw-bold">Giriş Yap</h2>
+                <p class="text-muted">Muhasebe sistemine erişmek için bilgilerinizi giriniz.</p>
+            </div>
+
+            <!-- Bildirimler (Flash messages) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login', next=request.args.get('next')) }}" method="POST" class="text-start">
+                <div class="mb-3">
+                    <label for="kullanici_adi" class="form-label fw-bold">Kullanıcı Adı</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="kullanici_adi" name="kullanici_adi" required autofocus>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="sifre" class="form-label fw-bold">Şifre</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="sifre" name="sifre" required>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg btn-gradient">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Giriş Yap
+                    </button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

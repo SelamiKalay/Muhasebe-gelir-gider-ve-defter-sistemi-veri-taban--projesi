@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Fişler — Muhasebe Sistemi{% endblock %}
+
+{% block content %}
+<!-- ═══════ Sayfa Başlığı ═══════ -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">
+            <i class="bi bi-list-columns-reverse me-2"></i>Muhasebe Fişleri
+        </h1>
+        <p class="text-muted mb-0">Tüm fişleri filtreleyin ve görüntüleyin</p>
+    </div>
+    <a href="{{ url_for('fis_ekle_form') }}" class="btn btn-gradient">
+        <i class="bi bi-plus-circle me-2"></i>Yeni Fiş
+    </a>
+</div>
+
+<!-- ═══════ Filtreler ═══════ -->
+<div class="glass-card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('fisler') }}" class="row g-3 align-items-end" id="filtreForm">
+            <div class="col-md-3">
+                <label for="baslangic" class="form-label small text-muted">
+                    <i class="bi bi-calendar-event me-1"></i>Başlangıç Tarihi
+                </label>
+                <input type="date" class="form-control form-control-custom" id="baslangic" name="baslangic"
+                       value="{{ baslangic }}">
+            </div>
+            <div class="col-md-3">
+                <label for="bitis" class="form-label small text-muted">
+                    <i class="bi bi-calendar-check me-1"></i>Bitiş Tarihi
+                </label>
+                <input type="date" class="form-control form-control-custom" id="bitis" name="bitis"
+                       value="{{ bitis }}">
+            </div>
+            <div class="col-md-3">
+                <label for="tur" class="form-label small text-muted">
+                    <i class="bi bi-funnel me-1"></i>Fiş Türü
+                </label>
+                <select class="form-select form-control-custom" id="tur" name="tur">
+                    <option value="">Tümü</option>
+                    <option value="Mahsup" {% if tur == 'Mahsup' %}selected{% endif %}>Mahsup</option>
+                    <option value="Tahsil" {% if tur == 'Tahsil' %}selected{% endif %}>Tahsil</option>
+                    <option value="Tediye" {% if tur == 'Tediye' %}selected{% endif %}>Tediye</option>
+                    <option value="Acilis" {% if tur == 'Acilis' %}selected{% endif %}>Açılış</option>
+                    <option value="Kapanis" {% if tur == 'Kapanis' %}selected{% endif %}>Kapanış</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-gradient flex-fill">
+                    <i class="bi bi-search me-1"></i>Filtrele
+                </button>
+                <a href="{{ url_for('fisler') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ═══════ Fiş Tablosu ═══════ -->
+<div class="glass-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0" id="fisTablosu">
+                <thead>
+                    <tr>
+                        <th>Fiş No</th>
+                        <th>Tarih</th>
+                        <th>Tür</th>
+                        <th>Açıklama</th>
+                        <th>Dönem</th>
+                        <th>Kullanıcı</th>
+                        <th class="text-end">Borç (₺)</th>
+                        <th class="text-end">Alacak (₺)</th>
+                        <th class="text-center">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fis in fisler %}
+                    <tr>
+                        <td class="fw-semibold">{{ fis['FisNo'] }}</td>
+                        <td>
+                            <i class="bi bi-calendar3 me-1 text-muted small"></i>
+                            {{ fis['FisTarihi'] }}
+                        </td>
+                        <td>
+                            <span class="badge badge-tur badge-{{ fis['FisTuru']|lower }}">
+                                {{ fis['FisTuru'] }}
+                            </span>
+                        </td>
+                        <td class="text-truncate" style="max-width: 200px;">
+                            {{ fis['Aciklama'] or '—' }}
+                        </td>
+                        <td class="small text-muted">{{ fis['DonemAdi'] }}</td>
+                        <td class="small">{{ fis['Kullanici'] }}</td>
+                        <td class="text-end fw-semibold">{{ "{:,.2f}".format(fis['ToplamBorc']) }}</td>
+                        <td class="text-end fw-semibold">{{ "{:,.2f}".format(fis['ToplamAlacak']) }}</td>
+                        <td class="text-center">
+                            <a href="{{ url_for('fis_detay', fis_id=fis['FisID']) }}"
+                               class="btn btn-sm btn-outline-light" title="Detay">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if session.get('rol') == 'Yonetici' %}
+                            <button class="btn btn-sm btn-outline-danger ms-1" title="Fişi Sil" onclick="fisSil({{ fis['FisID'] }}, '{{ fis['FisNo'] }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                            Filtrelere uygun fiş bulunamadı.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if fisler %}
+    <div class="card-footer-custom text-muted small text-end px-4 py-2">
+        Toplam {{ fisler|length }} fiş listeleniyor
+    </div>
+    {% endif %}
+</div>
+</div>
+
+<script>
+    function fisSil(fisId, fisNo) {
+        if(confirm(`"${fisNo}" numaralı fişi ve ona ait tüm satırları kalıcı olarak silmek istediğinize emin misiniz?`)) {
+            fetch(`/api/fis-sil/${fisId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Silme hatası:', error);
+                alert('Fiş silinirken sunucu hatası oluştu.');
+            });
+        }
+    }
+</script>
+{% endblock %}
