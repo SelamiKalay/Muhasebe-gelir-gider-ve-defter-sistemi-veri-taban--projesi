@@ -11,8 +11,10 @@ from seed_data import seed
 import json
 import os
 import hashlib
+import hmac
 from datetime import datetime
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ── Flask Uygulaması ──
 app = Flask(__name__)
@@ -20,6 +22,23 @@ app.secret_key = os.environ.get('SECRET_KEY') or os.urandom(24)
 
 # Veritabanı hook'larını kaydet
 init_app(app)
+
+# ── Şifre ve Yönlendirme Yardımcıları ──
+def sifre_hashle(sifre):
+    return generate_password_hash(sifre)
+
+def sifre_dogrula(kayitli_hash, sifre):
+    """Eski (tuzsuz SHA1) ve yeni (werkzeug) hash biçimlerini doğrular."""
+    if '$' not in kayitli_hash:
+        eski = hashlib.sha1(sifre.encode('utf-8')).hexdigest()
+        return hmac.compare_digest(kayitli_hash, eski)
+    return check_password_hash(kayitli_hash, sifre)
+
+def guvenli_yonlendirme(hedef):
+    """Açık yönlendirmeyi (open redirect) önlemek için yalnızca site içi yollara izin verir."""
+    if hedef and hedef.startswith('/') and not hedef.startswith('//') and '\\' not in hedef:
+        return hedef
+    return url_for('index')
 
 # ── Oturum Kontrol Decorator'ları ──
 def login_required(f):
@@ -138,21 +157,24 @@ def login():
     if request.method == 'POST':
         kullanici_adi = request.form.get('kullanici_adi', '').strip()
         sifre = request.form.get('sifre', '').strip()
-        sifre_hash = hashlib.sha1(sifre.encode('utf-8')).hexdigest()
-
         user = query_db(
-            "SELECT * FROM Kullanicilar WHERE KullaniciAdi = ? AND SifreHash = ? AND Aktif = 1",
-            (kullanici_adi, sifre_hash),
+            "SELECT * FROM Kullanicilar WHERE KullaniciAdi = ? AND Aktif = 1",
+            (kullanici_adi,),
             one=True
         )
 
-        if user:
+        if user and sifre_dogrula(user['SifreHash'], sifre):
+            # Eski SHA1 hash'i ilk başarılı girişte güvenli biçime yükselt
+            if '$' not in user['SifreHash']:
+                execute_db("UPDATE Kullanicilar SET SifreHash = ? WHERE KullaniciID = ?",
+                           (sifre_hashle(sifre), user['KullaniciID']))
+            session.clear()
             session['kullanici_id'] = user['KullaniciID']
             session['kullanici_adi'] = user['KullaniciAdi']
             session['ad_soyad'] = user['AdSoyad']
             session['rol'] = user['Rol']
             flash(f'Hoş geldiniz, {user["AdSoyad"]}!', 'success')
-            return redirect(request.args.get('next') or url_for('index'))
+            return redirect(guvenli_yonlendirme(request.args.get('next')))
         else:
             flash('Hatalı kullanıcı adı veya şifre.', 'danger')
 
@@ -174,7 +196,7 @@ def kullanicilar():
         rol = request.form.get('rol', 'Muhasebeci')
         
         if k_adi and sifre and ad_soyad:
-            sifre_hash = hashlib.sha1(sifre.encode('utf-8')).hexdigest()
+            sifre_hash = sifre_hashle(sifre)
             try:
                 execute_db(
                     "INSERT INTO Kullanicilar (KullaniciAdi, SifreHash, AdSoyad, Rol) VALUES (?, ?, ?, ?)",
@@ -198,7 +220,7 @@ def sifre_degistir():
     yeni_sifre = request.form.get('yeni_sifre', '').strip()
     
     if kullanici_id and yeni_sifre:
-        sifre_hash = hashlib.sha1(yeni_sifre.encode('utf-8')).hexdigest()
+        sifre_hash = sifre_hashle(yeni_sifre)
         try:
             execute_db("UPDATE Kullanicilar SET SifreHash = ? WHERE KullaniciID = ?", (sifre_hash, kullanici_id))
             flash('Şifre başarıyla güncellendi.', 'success')
@@ -312,6 +334,7 @@ def fis_detay(fis_id):
 # ══════════════════════════════════════════════
 
 @app.route('/api/fis-ekle', methods=['POST'])
+@login_required
 def api_fis_ekle():
     """
     Yeni fiş + satırlarını ekleyen API endpoint'i.
@@ -450,6 +473,7 @@ def api_fis_sil(fis_id):
 
 
 @app.route('/api/hesaplar')
+@login_required
 def api_hesaplar():
     """Hesap planı listesi (JSON)."""
     rows = query_db("SELECT HesapID, HesapKodu, HesapAdi, HesapTuru FROM HesapPlani WHERE Aktif=1 ORDER BY HesapKodu")
@@ -457,6 +481,7 @@ def api_hesaplar():
 
 
 @app.route('/api/cariler')
+@login_required
 def api_cariler():
     """Cari hesap listesi (JSON)."""
     rows = query_db("SELECT CariID, CariKodu, CariAdi, CariTuru FROM CariHesaplar WHERE Aktif=1 ORDER BY CariKodu")
@@ -464,6 +489,7 @@ def api_cariler():
 
 
 @app.route('/api/kategoriler')
+@login_required
 def api_kategoriler():
     """Gelir-gider kategorileri listesi (JSON)."""
     rows = query_db("SELECT KategoriID, KategoriAdi, Tur FROM GelirGiderKategorileri ORDER BY Tur, KategoriAdi")
@@ -471,6 +497,7 @@ def api_kategoriler():
 
 
 @app.route('/api/dashboard')
+@login_required
 def api_dashboard():
     """Dashboard verileri (JSON) — aylık kâr/zarar grafiği için."""
     aylik = query_db("""
@@ -494,4 +521,4 @@ if __name__ == '__main__':
     print("  Muhasebe Web Uygulaması")
     print("  http://127.0.0.1:5000")
     print("=" * 50)
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    app.run(debug=os.environ.get('FLASK_DEBUG') == '1', host='127.0.0.1', port=5000)
