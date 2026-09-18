@@ -222,8 +222,8 @@ Tüm tablolar **3NF** gereksinimini karşılamaktadır.
 ## 5. DDL ve DML Scriptleri
 
 > **Not:** Tam çalışır DDL ve DML scriptleri ayrı dosyalarda sağlanmıştır:
-> - [01_DDL_Create_Tables.sql](file:///c:/Users/selam/Desktop/muhasebe%20veri%20tabanı%20projesi/01_DDL_Create_Tables.sql)
-> - [02_DML_Insert_Data.sql](file:///c:/Users/selam/Desktop/muhasebe%20veri%20tabanı%20projesi/02_DML_Insert_Data.sql)
+> - [01_DDL_Create_Tables.sql](../sql/01_DDL_Create_Tables.sql)
+> - [02_DML_Insert_Data.sql](../sql/02_DML_Insert_Data.sql)
 
 Aşağıda özet yapılar verilmiştir. Detaylı scriptler için yukarıdaki dosyalara bakınız.
 
@@ -256,8 +256,8 @@ Aşağıda özet yapılar verilmiştir. Detaylı scriptler için yukarıdaki dos
 ## 6. SQL Sorguları
 
 > **Not:** Tüm sorgular ayrı dosyalarda sağlanmıştır:
-> - [03_Temel_Sorgular.sql](file:///c:/Users/selam/Desktop/muhasebe%20veri%20tabanı%20projesi/03_Temel_Sorgular.sql)
-> - [04_Ileri_Duzey_Sorgular.sql](file:///c:/Users/selam/Desktop/muhasebe%20veri%20tabanı%20projesi/04_Ileri_Duzey_Sorgular.sql)
+> - [03_Temel_Sorgular.sql](../sql/03_Temel_Sorgular.sql)
+> - [04_Ileri_Duzey_Sorgular.sql](../sql/04_Ileri_Duzey_Sorgular.sql)
 
 ### 6.1 Temel Sorgular (3 Adet)
 
@@ -343,7 +343,7 @@ ORDER BY ABS(SUM(fs.BorcTutari * fs.KurDegeri) - SUM(fs.AlacakTutari * fs.KurDeg
 ## 7. Veritabanı Objeleri
 
 > **Not:** Tüm objeler çalışır SQL kodu ile ayrı dosyada sağlanmıştır:
-> - [05_Veritabani_Objeleri.sql](file:///c:/Users/selam/Desktop/muhasebe%20veri%20tabanı%20projesi/05_Veritabani_Objeleri.sql)
+> - [05_Veritabani_Objeleri.sql](../sql/05_Veritabani_Objeleri.sql)
 
 ### 7.1 View — Günlük Gelir-Gider Özeti
 

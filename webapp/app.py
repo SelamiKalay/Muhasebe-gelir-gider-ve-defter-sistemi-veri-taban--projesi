@@ -9,13 +9,14 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from database import init_db, init_app, query_db, execute_db, get_db
 from seed_data import seed
 import json
+import os
 import hashlib
 from datetime import datetime
 from functools import wraps
 
 # ── Flask Uygulaması ──
 app = Flask(__name__)
-app.secret_key = 'muhasebe-gizli-anahtar-2026'
+app.secret_key = os.environ.get('SECRET_KEY') or os.urandom(24)
 
 # Veritabanı hook'larını kaydet
 init_app(app)
